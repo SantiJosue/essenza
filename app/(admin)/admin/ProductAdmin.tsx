@@ -8,6 +8,7 @@ import { useCallback, useState } from "react";
 import Notification from "@/components/common/Notification";
 import { useRouter } from "next/navigation";
 import { Category } from "@/src/generated/prisma/client";
+import LogoutButton from "@/components/admin/LogoutButton";
 
 type ProductAdminProps = {
   products: Product[]

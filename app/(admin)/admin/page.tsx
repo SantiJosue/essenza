@@ -4,6 +4,7 @@ import ProductAdmin from "./ProductAdmin";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/src/lib/auth-options";
 import { redirect } from "next/navigation";
+import LogoutButton from "@/components/admin/LogoutButton";
 
 async function getProducts() {
     return await prisma.product.findMany({
@@ -33,9 +34,13 @@ export default async function AdminPage() {
     return (
         <main className="min-h-screen bg-essenza-background px-6 py-10 md:py-24">
             <div className="mx-auto max-w-7xl">
-                <BackLink href="/">
-                    Volver al inicio
-                </BackLink>
+                <div className="flex justify-between">
+                    <BackLink href="/">
+                        Volver al inicio
+                    </BackLink>
+
+                    <LogoutButton />
+                </div>
 
                 <h1 className="mt-12 font-display text-4xl">
                     Administración de productos

@@ -55,18 +55,12 @@ export default function Navbar() {
         </div>
 
         {/* Botón desktop */}
-        <div className="flex gap-2 flex-col md:flex-row items-center justify-center">
+        <div>
           <Link
             href="/catalogo"
             className="hidden rounded-full bg-essenza-primary px-5 py-2.5 text-sm text-white transition hover:opacity-90 md:block"
           >
             Ver catálogo
-          </Link>
-          <Link
-            href="/admin"
-            className="rounded-full border border-essenza-primary/20 px-6 py-3 text-sm font-medium text-essenza-text transition hover:bg-essenza-primary/5"
-          >
-            Administración
           </Link>
         </div>
 
@@ -113,19 +107,13 @@ export default function Navbar() {
             )
           })}
 
-          <div className="flex flex-col gap-2">
+          <div className="flex justify-center">
             <Link
               href="/catalogo"
               onClick={() => setIsOpen(false)}
-              className="rounded-full bg-essenza-primary px-5 py-3 text-center text-sm text-white"
+              className="rounded-full w-full bg-essenza-primary px-5 py-3 text-center text-sm text-white"
             >
               Ver catálogo
-            </Link>
-            <Link
-              href="/admin"
-              className="rounded-full border border-essenza-primary/20 px-5 py-3 text-center text-sm font-medium text-essenza-text transition hover:bg-essenza-primary/5"
-            >
-              Administración
             </Link>
           </div>
 
