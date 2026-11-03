@@ -1,14 +1,13 @@
+import Link from "next/link";
+
 const categories = [
-  "Perfumes",
+  "Cuidado facial",
   "Cuidado corporal",
-  "Rostro",
-  "Maquillaje",
-  "Cabello",
 ];
 
 export default function Categories() {
   return (
-    <section className="bg-essenza-surface px-6 py-24">
+    <section className="bg-essenza-surface px-6 py-12 md:py-24">
         <div className="mx-auto max-w-7xl">
 
             <div className="max-w-xl">
@@ -19,16 +18,18 @@ export default function Categories() {
                 <p className="mt-4 leading-relaxed text-essenza-text/70">Descubrí productos seleccionados para acompañarte en cada momento.</p>
             </div>
 
-            <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+            <div className="mt-12 grid gap-4 sm:grid-cols-2">
                 {categories.map(category => (
-                    <button
+                    <Link
+                        href={`/catalogo?categoria=${encodeURI(category)}`}
                         key={category}
-                        className="group rounded-2xl border  border-essenza-text/10 bg-essenza-background p-8 text-left transition hover:-translate-y-1 hover:border-essenza-primary/30 hover:shadow-sm"
+                        className="group rounded-2xl border  border-essenza-text/10 active:scale-90
+                        bg-essenza-background p-8 text-left transition hover:-translate-y-1 hover:border-essenza-primary/30"
                     >
                         <span className="font-display text-2xl">{category}</span>
 
-                        <span className="mt-4 block text-sm text-essenza-text/50 transition group-hover:text-essenza-primary">Explorar →</span>
-                    </button>
+                        <span className="mt-4 block text-sm text-essenza-text/50 transition group-hover:text-essenza-primary cursor-pointer">Explorar →</span>
+                    </Link>
                 ))}
             </div>
 

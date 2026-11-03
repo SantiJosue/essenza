@@ -54,7 +54,7 @@ export default function Hero() {
           </div>
         </div>
 
-        <div className="relative flex min-h-112.5 items-center justify-center overflow-hidden rounded-3xl bg-essenza-accent/30">
+        <div className="relative flex min-h-90 md:min-h-112.5 items-center justify-center overflow-hidden rounded-3xl bg-essenza-accent/30">
 
           <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-essenza-primary/10" />
 

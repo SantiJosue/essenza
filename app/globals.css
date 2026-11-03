@@ -8,6 +8,26 @@
   --color-text: #2e2e2e;
 }
 
+@keyframes notification-enter {
+    from {
+        opacity: 0;
+        transform: translateY(-12px);
+    } to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes notification-exit {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    } to {
+        opacity: 0;
+        transform: translateY(-12px);
+    }
+}
+
 @theme {
     --font-sans: var(--font-inter);
     --font-display: var(--font-playfair);
@@ -17,6 +37,16 @@
     --color-essenza-surface: var(--color-surface);
     --color-essenza-accent: var(--color-accent);
     --color-essenza-text: var(--color-text);
+
+    --animate-notification-enter: notification-enter 300ms ease-out both;
+    --animate-notification-exit: notification-exit 250ms ease-in both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .animate-notification-enter,
+    .animate-notification-exit {
+        animation: none;
+    }
 }
 
 body {
