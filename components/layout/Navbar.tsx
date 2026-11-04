@@ -55,19 +55,17 @@ export default function Navbar() {
         </div>
 
         {/* Botón desktop */}
-        <div>
-          <Link
-            href="/catalogo"
-            className="hidden rounded-full bg-essenza-primary px-5 py-2.5 text-sm text-white transition hover:opacity-90 md:block"
-          >
-            Ver catálogo
-          </Link>
-        </div>
+        <Link
+          href="/catalogo"
+          className="hidden rounded-full bg-essenza-primary px-5 py-2.5 text-sm text-white transition hover:opacity-90 md:block"
+        >
+          Ver catálogo
+        </Link>
 
         {/* Botón menú mobile */}
         <button
           type="button"
-          onClick={() => setIsOpen(!isOpen)}
+          onClick={() => setIsOpen((prev) => !prev)}
           className="text-2xl md:hidden"
           aria-label={isOpen ? "Cerrar menú" : "Abrir menú"}
         >
