@@ -1,11 +1,11 @@
+import type { Category } from "@/src/generated/prisma/client";
 import Link from "next/link";
 
-const categories = [
-  "Cuidado facial",
-  "Cuidado corporal",
-];
+type CategoriesProps = {
+    categories: Category[]
+}
 
-export default function Categories() {
+export default function Categories({categories} : CategoriesProps) {
   return (
     <section className="bg-essenza-surface px-6 py-12 md:py-24">
         <div className="mx-auto max-w-7xl">
@@ -18,15 +18,15 @@ export default function Categories() {
                 <p className="mt-4 leading-relaxed text-essenza-text/70">Descubrí productos seleccionados para acompañarte en cada momento.</p>
             </div>
 
-            <div className="mt-12 grid gap-4 sm:grid-cols-2">
+            <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 {categories.map(category => (
                     <Link
-                        href={`/catalogo?categoria=${encodeURI(category)}`}
-                        key={category}
+                        href={`/catalogo?categoria=${encodeURIComponent(category.name)}`}
+                        key={category.id}
                         className="group rounded-2xl border  border-essenza-text/10 active:scale-90
                         bg-essenza-background p-8 text-left transition hover:-translate-y-1 hover:border-essenza-primary/30"
                     >
-                        <span className="font-display text-2xl">{category}</span>
+                        <span className="font-display text-2xl">{category.name}</span>
 
                         <span className="mt-4 block text-sm text-essenza-text/50 transition group-hover:text-essenza-primary cursor-pointer">Explorar →</span>
                     </Link>

@@ -13,13 +13,21 @@ async function getProducts() {
   })
 }
 
+async function getCategories() {
+  return prisma.category.findMany({
+    orderBy: {
+      id: 'asc'
+    }
+  })
+}
+
 export default async function HomePage() {
-  const products = await getProducts()
+  const [products, categories] = await Promise.all([getProducts(), getCategories()])
 
   return (
     <main>
       <Hero />
-      <Categories />
+      <Categories categories={categories} />
       <FeaturdProducts products={products} />
       <WhyEssenza />
       <ContactCTA />

@@ -12,20 +12,42 @@ const adapter = new PrismaPg({
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
-  console.log("Probando conexión con Neon...");
+  const categories = [
+    "Perfumes",
+    "Jabones",
+    "Cuidado facial",
+    "Cuidado corporal",
+    "Cuidado del cabello",
+    "Desodorantes",
+    "Cuidado masculino",
+  ]
+
   await prisma.$connect();
 
-  const skincare = await prisma.category.upsert({
-    where: { name: "Cuidado facial" },
-    update: {},
-    create: { name: "Cuidado facial" },
-  });
+  const createdCategories = []
 
-  const bodyCare = await prisma.category.upsert({
-    where: { name: "Cuidado corporal" },
-    update: {},
-    create: { name: "Cuidado corporal" },
-  });
+  for(const categoryName of categories) {
+    const createdCategory = await prisma.category.upsert({
+      where: {
+        name: categoryName 
+      },
+      update: {},
+      create: { name: categoryName }
+    })
+    createdCategories.push(createdCategory)
+  }
+
+  const skincareCategory = createdCategories.find(category => category.name === "Cuidado facial")
+
+  if (!skincareCategory) {
+   throw new Error("No se encontró la categoría Cuidado facial")
+  }
+
+  const bodycareCategory = createdCategories.find(category => category.name === "Cuidado corporal")
+
+  if (!bodycareCategory) {
+    throw new Error("No se encontró la categoría Cuidado corporal")
+  }
 
   const products = [
   {
@@ -35,7 +57,7 @@ async function main() {
     description: "Hidratación diaria para una piel suave.",
     price: 15000,
     image: "/products/crema-hidratante.webp",
-    categoryId: skincare.id,
+    categoryId: skincareCategory.id,
   },
   {
     slug: "serum-facial",
@@ -44,7 +66,7 @@ async function main() {
     description: "Un sérum para complementar tu rutina facial.",
     price: 18500,
     image: "/products/serum-facial.webp",
-    categoryId: skincare.id,
+    categoryId: skincareCategory.id,
   },
   {
     slug: "locion-corporal",
@@ -53,7 +75,7 @@ async function main() {
     description: "Loción para el cuidado diario de la piel.",
     price: 12000,
     image: "/products/locion-corporal.webp",
-    categoryId: bodyCare.id,
+    categoryId: bodycareCategory.id,
   },
 ];
 
