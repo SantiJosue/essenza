@@ -150,6 +150,22 @@ export async function PUT(
       );
     }
 
+    if (body.stock === undefined || body.stock === null || body.stock === "") {
+      return NextResponse.json(
+        { error: "El stock es obligatorio." },
+        { status: 400 },
+      );
+    }
+
+    const stock = Number(body.stock);
+
+    if (!Number.isSafeInteger(stock) || stock < 0) {
+      return NextResponse.json(
+        { error: "El stock no es válido." },
+        { status: 400 },
+      );
+    }
+
     const image = body.image;
 
     if (typeof image !== "string" || image.trim() === "") {
@@ -194,6 +210,7 @@ export async function PUT(
         slug,
         description,
         price,
+        stock,
         image,
         categoryId,
       },

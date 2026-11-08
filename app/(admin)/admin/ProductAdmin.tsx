@@ -1,14 +1,13 @@
 "use client"
 
 import ProductManager from "./ProductManager";
-import { Edit2Icon, Trash } from "lucide-react";
+import { Edit2Icon, Package, Trash } from "lucide-react";
 import { formatCurrency } from "@/src/utils/formatCurrency";
 import { Product } from "@/src/types/product";
 import { useCallback, useState } from "react";
 import Notification from "@/components/common/Notification";
 import { useRouter } from "next/navigation";
 import { Category } from "@/src/generated/prisma/client";
-import LogoutButton from "@/components/admin/LogoutButton";
 
 type ProductAdminProps = {
   products: Product[]
@@ -99,42 +98,72 @@ export default function ProductAdmin({ products, categories }: ProductAdminProps
             key={product.id}
             className="rounded-xl border border-essenza-text/10 bg-essenza-surface p-4 sm:p-5"
           >
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-              <div className="min-w-0 flex-1">
-                <h2 className="font-medium text-essenza-text">
-                  {product.name}
-                </h2>
+
+            <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+              {/* Información del producto */}
+              <div className="min-w-0 flex-1 sm:pr-8 lg:pr-12">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <h2 className="font-medium text-essenza-text">
+                    {product.name}
+                  </h2>
+
+                  <p className="shrink-0 font-semibold text-essenza-text">
+                    {formatCurrency(product.price)}
+                  </p>
+                </div>
 
                 <p className="mt-1 text-sm text-essenza-text/70">
                   {product.description}
                 </p>
 
-                <p className="mt-2 text-sm text-essenza-text/60">
+                <p className="mt-1 text-sm text-essenza-text/60">
                   Categoría: {product.category.name}
                 </p>
               </div>
 
-              <p className="font-semibold text-essenza-text">
-                {formatCurrency(product.price)}
-              </p>
-            </div>
+              {/* Precio, stock y acciones */}
+              <div className="flex flex-wrap items-center justify-between gap-4 sm:justify-end">
+                <div className="flex items-center gap-2">
+                  <Package size={18} className="text-essenza-text/60" />
 
-            <div className="mt-4 flex flex-wrap gap-2 text-sm *:cursor-pointer">
-              <button
-                onClick={() => productSelected(product)}
-                className="inline-flex items-center justify-center gap-2 rounded-2xl bg-essenza-primary px-4 py-2 font-medium text-white transition-colors hover:opacity-90"
-              >
-                Editar
-                <Edit2Icon size={16} />
-              </button>
+                  <div>
+                    <p className="text-xs text-essenza-text/60">
+                      Stock disponible
+                    </p>
 
-              <button
-                onClick={() => setProductToDelete(product)}
-                className="inline-flex items-center justify-center gap-2 rounded-2xl bg-red-600 px-4 py-2 font-medium text-white transition-colors hover:opacity-80"
-              >
-                Eliminar
-                <Trash size={16} />
-              </button>
+                    <p className="text-sm font-semibold text-essenza-text">
+                      {product.stock} unidades
+                    </p>
+                  </div>
+
+                  <span
+                    className={`rounded-full px-3 py-1 text-xs font-medium ${product.stock > 0
+                      ? "bg-emerald-500/10 text-emerald-700"
+                      : "bg-red-500/10 text-red-600"
+                      }`}
+                  >
+                    {product.stock > 0 ? "Disponible" : "Agotado"}
+                  </span>
+                </div>
+
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    onClick={() => productSelected(product)}
+                    className="inline-flex items-center justify-center gap-2 rounded-2xl bg-essenza-primary px-4 py-2 text-sm font-medium text-white transition-colors hover:opacity-90"
+                  >
+                    Editar
+                    <Edit2Icon size={16} />
+                  </button>
+
+                  <button
+                    onClick={() => setProductToDelete(product)}
+                    className="inline-flex items-center justify-center gap-2 rounded-2xl bg-red-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:opacity-80"
+                  >
+                    Eliminar
+                    <Trash size={16} />
+                  </button>
+                </div>
+              </div>
             </div>
           </li>
         ))}

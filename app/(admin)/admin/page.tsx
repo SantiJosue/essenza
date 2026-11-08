@@ -31,8 +31,6 @@ export default async function AdminPage() {
         getCategories()
     ])
 
-    // console.log(categories)
-
     return (
         <main className="min-h-screen bg-essenza-background px-6 py-10 md:py-24">
             <div className="mx-auto max-w-7xl">

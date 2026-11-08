@@ -40,7 +40,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
         <BackLink href="/catalogo">Volver al Catálogo</BackLink>
         <div className="mt-8 grid gap-12 md:grid-cols-2">
 
-          <div className="relative flex aspect-square items-center justify-center overflow-hidden rounded-3xl bg-essenza-primary/10">
+          <div className="relative flex aspect-3/4 max-h-162.5 items-center justify-center overflow-hidden rounded-3xl bg-essenza-primary/10">
             <Image
               alt={product.name}
               src={product.image}

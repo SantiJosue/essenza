@@ -4,6 +4,7 @@ import { useState } from "react";
 import ProductCard from "@/components/common/ProductCard";
 import type { Product } from "@/src/types/product";
 import { normalizeText } from "@/src/utils/normalizeText";
+import { Trash } from "lucide-react";
 
 type CatalogFiltersProps = {
     products: Product[];
@@ -68,6 +69,9 @@ export default function CatalogFilters({
                     <option value="desc">Precio: mayor a menor</option>
                 </select>
                 <button
+                    type="button"
+                    aria-label="Limpiar filtros"
+                    title="Limpiar filtros"
                     onClick={() => {
                         setSearch('')
                         setSelectedCategory('Todas')
@@ -75,7 +79,7 @@ export default function CatalogFilters({
                     }}
                     className="text-sm font-display font-medium text-essenza-primary cursor-pointer hover:underline"
                 >
-                    Limpiar Filtros
+                    <Trash size={20} />
                 </button>
             </div>
 
@@ -84,7 +88,7 @@ export default function CatalogFilters({
             </p>
 
             {sortedProducts.length > 0 ? (
-                <ul className="mt-12 grid grid-cols-1 gap-x-6 gap-y-16 sm:grid-cols-2 lg:grid-cols-3">
+                <ul className="mt-12 grid items-stretch grid-cols-1 gap-x-6 gap-y-16 sm:grid-cols-2 lg:grid-cols-3">
                     {sortedProducts.map(product => (
                         <li key={product.id}>
                             <ProductCard

@@ -29,6 +29,7 @@ export default function ProductManager({ selectedProduct, setSelectedProduct, ca
         const name = formData.get('name')
         const description = formData.get('description')
         const price = formData.get('price')
+        const stock = formData.get('stock')
         const categoryId = formData.get('categoryId')
         const image = formData.get('image')
 
@@ -68,6 +69,24 @@ export default function ProductManager({ selectedProduct, setSelectedProduct, ca
 
         if (!Number.isInteger(priceValue) || priceValue < 1) {
             setMessage("El precio debe ser mayor a 0.")
+            setMessageType("error")
+            setShowMessage(true)
+            setIsClosing(false)
+            return
+        }
+
+        if(typeof stock !== "string" || stock.trim() === "") {
+            setMessage("Ingresá una cantidad de stock válida.")
+            setMessageType("error")
+            setShowMessage(true)
+            setIsClosing(false)
+            return
+        }
+
+        const stockValue = Number(stock)
+
+        if(!Number.isSafeInteger(stockValue) || stockValue < 0) {
+            setMessage("El stock debe ser un número entero mayor o igual a 0.")
             setMessageType("error")
             setShowMessage(true)
             setIsClosing(false)
@@ -118,6 +137,7 @@ export default function ProductManager({ selectedProduct, setSelectedProduct, ca
                     name,
                     description,
                     price: priceValue,
+                    stock: stockValue,
                     categoryId: categoryIdValue,
                     image,
                 }),
@@ -125,7 +145,7 @@ export default function ProductManager({ selectedProduct, setSelectedProduct, ca
 
             const data = await response.json()
 
-            if(!response.ok) {
+            if (!response.ok) {
                 setMessage(data.error)
                 setMessageType("error")
                 setShowMessage(true)
@@ -152,13 +172,14 @@ export default function ProductManager({ selectedProduct, setSelectedProduct, ca
                     name,
                     description,
                     price: priceValue,
+                    stock: stockValue,
                     categoryId: categoryIdValue,
                     image,
                 }),
             });
-    
+
             const data = await response.json();
-    
+
             if (!response.ok) {
                 setMessage(data.error)
                 setMessageType("error")
@@ -166,7 +187,7 @@ export default function ProductManager({ selectedProduct, setSelectedProduct, ca
                 setIsClosing(false)
                 return
             }
-    
+
             setMessage(data.message)
             setMessageType("success")
             setShowMessage(true)
@@ -215,7 +236,7 @@ export default function ProductManager({ selectedProduct, setSelectedProduct, ca
 
             {(isFormOpen || selectedProduct) && (
                 <div className="fixed inset-0 z-30 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm" onClick={(e) => {
-                    if(e.target === e.currentTarget) {
+                    if (e.target === e.currentTarget) {
                         handleCloseForm()
                     }
                 }}>
@@ -307,7 +328,7 @@ export default function ProductManager({ selectedProduct, setSelectedProduct, ca
                                         min="1"
                                         step="1"
                                         placeholder="15000"
-                                        defaultValue={selectedProduct ? selectedProduct.price : ''}
+                                        defaultValue={selectedProduct ? selectedProduct.price : ""}
                                         required
                                         className="w-full rounded-xl border border-essenza-primary/20 bg-essenza-surface px-4 py-3 text-sm outline-none transition focus:border-essenza-primary focus:ring-2 focus:ring-essenza-primary/10"
                                     />
@@ -315,33 +336,34 @@ export default function ProductManager({ selectedProduct, setSelectedProduct, ca
 
                                 <div>
                                     <label
-                                        htmlFor="categoryId"
+                                        htmlFor="stock"
                                         className="mb-2 block text-sm font-medium text-essenza-text"
                                     >
-                                        Categoría
+                                        Stock disponible
                                     </label>
 
-                                    <select
-                                        id="categoryId"
-                                        name="categoryId"
+                                    <input
+                                        id="stock"
+                                        name="stock"
+                                        type="number"
+                                        min="0"
+                                        step="1"
+                                        placeholder="0"
+                                        defaultValue={selectedProduct?.stock ?? 0}
                                         required
-                                        defaultValue={selectedProduct ? selectedProduct.categoryId : ''}
                                         className="w-full rounded-xl border border-essenza-primary/20 bg-essenza-surface px-4 py-3 text-sm outline-none transition focus:border-essenza-primary focus:ring-2 focus:ring-essenza-primary/10"
-                                    >
-                                        <option value="" disabled>
-                                            Elegí una categoría
-                                        </option>
-
-                                        {categories.map((category) => (
-                                            <option
-                                                key={category.id}
-                                                value={category.id}
-                                            >
-                                                {category.name}
-                                            </option>
-                                        ))}
-                                    </select>
+                                    />
                                 </div>
+                            </div>
+
+                            <div>
+                                <label
+                                    htmlFor="categoryId"
+                                    className="mb-2 block text-sm font-medium text-essenza-text"
+                                >
+                                    Categoría
+                                </label>
+
                             </div>
 
                             <div>

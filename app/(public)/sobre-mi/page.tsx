@@ -1,4 +1,5 @@
 import BackLink from "@/components/common/BackLink";
+import Image from "next/image";
 
 export default function SobreMiPage() {
   return (
@@ -28,10 +29,14 @@ export default function SobreMiPage() {
 
         <section className="mt-24 grid gap-12 md:grid-cols-2 md:items-center">
 
-          <div className="flex aspect-square items-center justify-center rounded-3xl bg-essenza-primary/10">
-            <span className="text-sm text-essenza-primary">
-              Imagen de Essenza
-            </span>
+          <div className="relative aspect-4/3 overflow-hidden rounded-3xl bg-essenza-primary/10">
+            <Image
+              src="/products/portada-essenza.webp"
+              alt="Productos de Essenza"
+              fill
+              className="object-contain"
+              sizes="(max-width: 768px) 100vw, 50vw"
+            />
           </div>
 
           <div>
