@@ -10,13 +10,10 @@ export async function PUT(
   context: { params: Promise<{ id: string }> },
 ) {
   try {
-    const session = await getServerSession(authOptions)
+    const session = await getServerSession(authOptions);
 
-    if(!session) {
-      return NextResponse.json(
-        { error: "No autorizado" },
-        { status: 401 },
-      )
+    if (!session) {
+      return NextResponse.json({ error: "No autorizado" }, { status: 401 });
     }
 
     const { id } = await context.params;
@@ -166,6 +163,19 @@ export async function PUT(
       );
     }
 
+    if (
+      typeof body.isActive !== "boolean" ||
+      typeof body.isFeatured !== "boolean"
+    ) {
+      return NextResponse.json(
+        { error: "El estado del producto no es válido." },
+        { status: 400 },
+      );
+    }
+
+    const isActive = body.isActive;
+    const isFeatured = body.isFeatured;
+
     const image = body.image;
 
     if (typeof image !== "string" || image.trim() === "") {
@@ -211,6 +221,8 @@ export async function PUT(
         description,
         price,
         stock,
+        isActive,
+        isFeatured,
         image,
         categoryId,
       },
@@ -234,18 +246,18 @@ export async function PUT(
   }
 }
 
-export async function DELETE(_request: Request, context: { params: Promise<{ id: string }> }) {
+export async function DELETE(
+  _request: Request,
+  context: { params: Promise<{ id: string }> },
+) {
   try {
-    const session = await getServerSession(authOptions)
+    const session = await getServerSession(authOptions);
 
-    if(!session) {
-      return NextResponse.json(
-        { error: "No autorizado" },
-        { status: 401 },
-      )
+    if (!session) {
+      return NextResponse.json({ error: "No autorizado" }, { status: 401 });
     }
 
-    const { id } = await context.params
+    const { id } = await context.params;
 
     if (typeof id !== "string" || id.trim() === "") {
       return NextResponse.json(
@@ -265,26 +277,26 @@ export async function DELETE(_request: Request, context: { params: Promise<{ id:
 
     const existingProduct = await prisma.product.findUnique({
       where: {
-        id: productId
-      }
-    })
+        id: productId,
+      },
+    });
 
-    if(!existingProduct) {
+    if (!existingProduct) {
       return NextResponse.json(
         { error: "El producto no existe" },
-        { status: 404 }
-      )
+        { status: 404 },
+      );
     }
-    
+
     await prisma.product.delete({
       where: {
-        id: productId
-      }
-    })
+        id: productId,
+      },
+    });
 
-    revalidatePath("/catalogo")
-    revalidatePath(`/catalogo/${existingProduct.slug}`)
- 
+    revalidatePath("/catalogo");
+    revalidatePath(`/catalogo/${existingProduct.slug}`);
+
     return NextResponse.json(
       { message: "¡Producto eliminado correctamente!" },
       { status: 200 },

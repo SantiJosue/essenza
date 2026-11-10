@@ -31,6 +31,8 @@ export default function ProductManager({ selectedProduct, setSelectedProduct, ca
         const price = formData.get('price')
         const stock = formData.get('stock')
         const categoryId = formData.get('categoryId')
+        const isActive = formData.get("isActive") === "on"
+        const isFeatured = formData.get("isFeatured") === "on"
         const image = formData.get('image')
 
         if (typeof name !== 'string' || name.trim() === '') {
@@ -75,7 +77,7 @@ export default function ProductManager({ selectedProduct, setSelectedProduct, ca
             return
         }
 
-        if(typeof stock !== "string" || stock.trim() === "") {
+        if (typeof stock !== "string" || stock.trim() === "") {
             setMessage("Ingresá una cantidad de stock válida.")
             setMessageType("error")
             setShowMessage(true)
@@ -85,7 +87,7 @@ export default function ProductManager({ selectedProduct, setSelectedProduct, ca
 
         const stockValue = Number(stock)
 
-        if(!Number.isSafeInteger(stockValue) || stockValue < 0) {
+        if (!Number.isSafeInteger(stockValue) || stockValue < 0) {
             setMessage("El stock debe ser un número entero mayor o igual a 0.")
             setMessageType("error")
             setShowMessage(true)
@@ -128,6 +130,24 @@ export default function ProductManager({ selectedProduct, setSelectedProduct, ca
         }
 
         if (selectedProduct) {
+            const hasChanges =
+                name.trim() !== selectedProduct.name ||
+                description.trim() !== selectedProduct.description ||
+                priceValue !== selectedProduct.price ||
+                stockValue !== selectedProduct.stock ||
+                categoryIdValue !== selectedProduct.categoryId ||
+                isActive !== selectedProduct.isActive ||
+                isFeatured !== selectedProduct.isFeatured ||
+                image !== selectedProduct.image;
+
+            if (!hasChanges) {
+                setMessage("No realizaste ningún cambio en el producto.")
+                setMessageType("error")
+                setShowMessage(true)
+                setIsClosing(false)
+                return
+            }
+
             const response = await fetch(`/api/products/${selectedProduct.id}`, {
                 method: "PUT",
                 headers: {
@@ -139,6 +159,8 @@ export default function ProductManager({ selectedProduct, setSelectedProduct, ca
                     price: priceValue,
                     stock: stockValue,
                     categoryId: categoryIdValue,
+                    isActive,
+                    isFeatured,
                     image,
                 }),
             });
@@ -174,6 +196,8 @@ export default function ProductManager({ selectedProduct, setSelectedProduct, ca
                     price: priceValue,
                     stock: stockValue,
                     categoryId: categoryIdValue,
+                    isActive,
+                    isFeatured,
                     image,
                 }),
             });
@@ -349,12 +373,13 @@ export default function ProductManager({ selectedProduct, setSelectedProduct, ca
                                         min="0"
                                         step="1"
                                         placeholder="0"
-                                        defaultValue={selectedProduct?.stock ?? 0}
+                                        defaultValue={selectedProduct?.stock ?? 1}
                                         required
                                         className="w-full rounded-xl border border-essenza-primary/20 bg-essenza-surface px-4 py-3 text-sm outline-none transition focus:border-essenza-primary focus:ring-2 focus:ring-essenza-primary/10"
                                     />
                                 </div>
                             </div>
+
 
                             <div>
                                 <label
@@ -364,6 +389,59 @@ export default function ProductManager({ selectedProduct, setSelectedProduct, ca
                                     Categoría
                                 </label>
 
+                                <select
+                                    id="categoryId"
+                                    name="categoryId"
+                                    defaultValue={selectedProduct?.categoryId ?? ""}
+                                    required
+                                    className="w-full rounded-xl border border-essenza-primary/20 bg-essenza-surface px-4 py-3 text-sm outline-none transition focus:border-essenza-primary focus:ring-2 focus:ring-essenza-primary/10"
+                                >
+                                    <option value="" disabled>
+                                        Seleccioná una categoría
+                                    </option>
+
+                                    {categories.map((category) => (
+                                        <option key={category.id} value={category.id}>
+                                            {category.name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                                <div className="flex items-center gap-3 rounded-xl border border-essenza-primary/15 bg-essenza-surface p-4">
+                                    <input
+                                        id="isActive"
+                                        name="isActive"
+                                        type="checkbox"
+                                        defaultChecked={selectedProduct?.isActive ?? true}
+                                        className="size-5 accent-essenza-primary"
+                                    />
+
+                                    <label
+                                        htmlFor="isActive"
+                                        className="cursor-pointer text-sm font-medium text-essenza-text"
+                                    >
+                                        Mostrar producto
+                                    </label>
+                                </div>
+
+                                <div className="flex items-center gap-3 rounded-xl border border-essenza-primary/15 bg-essenza-surface p-4">
+                                    <input
+                                        id="isFeatured"
+                                        name="isFeatured"
+                                        type="checkbox"
+                                        defaultChecked={selectedProduct?.isFeatured ?? false}
+                                        className="size-5 accent-essenza-primary"
+                                    />
+
+                                    <label
+                                        htmlFor="isFeatured"
+                                        className="cursor-pointer text-sm font-medium text-essenza-text"
+                                    >
+                                        Mostrar en productos destacados
+                                    </label>
+                                </div>
                             </div>
 
                             <div>

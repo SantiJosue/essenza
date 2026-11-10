@@ -26,13 +26,10 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const session = await getServerSession(authOptions)
+    const session = await getServerSession(authOptions);
 
-    if(!session) {
-      return NextResponse.json(
-        { error: "No autorizado" },
-        { status: 401 },
-      )
+    if (!session) {
+      return NextResponse.json({ error: "No autorizado" }, { status: 401 });
     }
 
     const body = await request.json();
@@ -86,7 +83,7 @@ export async function POST(request: Request) {
 
     const existingProduct = await prisma.product.findUnique({
       where: {
-        normalizedName: normalizedName,
+        normalizedName,
       },
     });
 
@@ -117,10 +114,10 @@ export async function POST(request: Request) {
     }
 
     if (body.price === undefined || body.price === null || body.price === "") {
-        return NextResponse.json(
-            { error: "El precio es obligatorio." },
-            { status: 400 }
-        );
+      return NextResponse.json(
+        { error: "El precio es obligatorio." },
+        { status: 400 },
+      );
     }
 
     const price = Number(body.price);
@@ -134,9 +131,9 @@ export async function POST(request: Request) {
 
     if (body.stock === undefined || body.stock === null || body.stock === "") {
       return NextResponse.json(
-            { error: "El stock es obligatorio." },
-            { status: 400 }
-        );
+        { error: "El stock es obligatorio." },
+        { status: 400 },
+      );
     }
 
     const stock = Number(body.stock);
@@ -147,6 +144,19 @@ export async function POST(request: Request) {
         { status: 400 },
       );
     }
+
+    if (
+      typeof body.isActive !== "boolean" ||
+      typeof body.isFeatured !== "boolean"
+    ) {
+      return NextResponse.json(
+        { error: "El estado del producto no es válido." },
+        { status: 400 },
+      );
+    }
+
+    const isActive = body.isActive;
+    const isFeatured = body.isFeatured;
 
     const image = body.image;
 
@@ -187,6 +197,8 @@ export async function POST(request: Request) {
         description,
         price,
         stock,
+        isActive,
+        isFeatured,
         image,
         categoryId,
       },

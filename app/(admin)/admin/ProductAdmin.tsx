@@ -102,7 +102,7 @@ export default function ProductAdmin({ products, categories }: ProductAdminProps
             <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
               {/* Información del producto */}
               <div className="min-w-0 flex-1 sm:pr-8 lg:pr-12">
-                <div className="flex flex-wrap items-center justify-between gap-2">
+                <div className="flex flex-wrap items-center justify-between md:flex-col md:items-baseline gap-1">
                   <h2 className="font-medium text-essenza-text">
                     {product.name}
                   </h2>
@@ -112,7 +112,7 @@ export default function ProductAdmin({ products, categories }: ProductAdminProps
                   </p>
                 </div>
 
-                <p className="mt-1 text-sm text-essenza-text/70">
+                <p className="mt-2 text-sm text-essenza-text/70">
                   {product.description}
                 </p>
 
@@ -123,7 +123,7 @@ export default function ProductAdmin({ products, categories }: ProductAdminProps
 
               {/* Precio, stock y acciones */}
               <div className="flex flex-wrap items-center justify-between gap-4 sm:justify-end">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 sm:gap-4">
                   <Package size={18} className="text-essenza-text/60" />
 
                   <div>
@@ -146,7 +146,7 @@ export default function ProductAdmin({ products, categories }: ProductAdminProps
                   </span>
                 </div>
 
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2 *:cursor-pointer">
                   <button
                     onClick={() => productSelected(product)}
                     className="inline-flex items-center justify-center gap-2 rounded-2xl bg-essenza-primary px-4 py-2 text-sm font-medium text-white transition-colors hover:opacity-90"
