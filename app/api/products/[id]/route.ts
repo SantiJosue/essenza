@@ -310,3 +310,239 @@ export async function DELETE(
     );
   }
 }
+
+export async function PATCH(
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> },
+) {
+  try {
+    const session = await getServerSession(authOptions);
+
+    if (!session) {
+      return NextResponse.json({ error: "No autorizado." }, { status: 401 });
+    }
+
+    const { id } = await context.params;
+
+    if (typeof id !== "string" || id.trim() === "") {
+      return NextResponse.json(
+        { error: "El id es obligatorio." },
+        { status: 400 },
+      );
+    }
+
+    const productId = Number(id);
+
+    if (!Number.isSafeInteger(productId) || productId < 1) {
+      return NextResponse.json(
+        { error: "El id del producto no es válido." },
+        { status: 400 },
+      );
+    }
+
+    const body = await request.json();
+
+    if (typeof body !== "object" || body === null || Array.isArray(body)) {
+      return NextResponse.json(
+        { error: "Los datos enviados no son válidos." },
+        { status: 400 },
+      );
+    }
+
+    const existingProduct = await prisma.product.findUnique({
+      where: { id: productId },
+    });
+
+    if (!existingProduct) {
+      return NextResponse.json(
+        { error: "El producto no existe." },
+        { status: 404 },
+      );
+    }
+
+    const data: {
+      name?: string;
+      normalizedName?: string;
+      slug?: string;
+      description?: string;
+      price?: number;
+      stock?: number;
+      isActive?: boolean;
+      isFeatured?: boolean;
+      image?: string;
+      categoryId?: number;
+    } = {};
+
+    if (body.name !== undefined) {
+      if (typeof body.name !== "string" || body.name.trim() === "") {
+        return NextResponse.json(
+          { error: "El nombre no es válido." },
+          { status: 400 },
+        );
+      }
+
+      const name = body.name.trim();
+      data.name = name;
+
+      const normalizedName = normalizeText(name);
+
+      data.normalizedName = normalizedName;
+      data.slug = normalizedName.trim().replace(/\s+/g, "-");
+
+      const duplicatedName = await prisma.product.findFirst({
+        where: {
+          normalizedName: data.normalizedName,
+          id: { not: productId },
+        },
+      });
+
+      if (duplicatedName) {
+        return NextResponse.json(
+          { error: "Ya existe un producto con ese nombre." },
+          { status: 409 },
+        );
+      }
+    }
+
+    if (body.description !== undefined) {
+      if (
+        typeof body.description !== "string" ||
+        body.description.trim() === ""
+      ) {
+        return NextResponse.json(
+          { error: "La descripción no es válida." },
+          { status: 400 },
+        );
+      }
+
+      const description = body.description.trim();
+
+      if (description.length > 500) {
+        return NextResponse.json(
+          { error: "La descripción no puede superar los 500 caracteres." },
+          { status: 400 },
+        );
+      }
+
+      data.description = description;
+    }
+
+    if (body.price !== undefined) {
+      const price = Number(body.price);
+
+      if (!Number.isSafeInteger(price) || price < 1) {
+        return NextResponse.json(
+          { error: "El precio no es válido." },
+          { status: 400 },
+        );
+      }
+
+      data.price = price;
+    }
+
+    if (body.stock !== undefined) {
+      const stock = Number(body.stock);
+
+      if (!Number.isSafeInteger(stock) || stock < 0) {
+        return NextResponse.json(
+          { error: "El stock no es válido." },
+          { status: 400 },
+        );
+      }
+
+      data.stock = stock;
+    }
+
+    if (body.isActive !== undefined) {
+      if (typeof body.isActive !== "boolean") {
+        return NextResponse.json(
+          { error: "El valor para mostrar producto no es válido." },
+          { status: 400 },
+        );
+      }
+
+      data.isActive = body.isActive;
+    }
+
+    if (body.isFeatured !== undefined) {
+      if (typeof body.isFeatured !== "boolean") {
+        return NextResponse.json(
+          { error: "El valor para mostrar producto destacado no es válido." },
+          { status: 400 },
+        );
+      }
+
+      data.isFeatured = body.isFeatured;
+    }
+
+    if (body.image !== undefined) {
+      if (
+        typeof body.image !== "string" ||
+        !body.image.trim().startsWith("/products/") ||
+        !body.image.trim().endsWith(".webp")
+      ) {
+        return NextResponse.json(
+          { error: "El formato de la imagen no es válido." },
+          { status: 400 },
+        );
+      }
+
+      data.image = body.image;
+    }
+
+    if (body.categoryId !== undefined) {
+      const categoryId = Number(body.categoryId);
+
+      if (!Number.isSafeInteger(categoryId) || categoryId < 1) {
+        return NextResponse.json(
+          { error: "La categoria ingresada no es válida." },
+          { status: 400 },
+        );
+      }
+
+      const category = await prisma.category.findUnique({
+        where: { id: categoryId },
+      });
+
+      if (!category) {
+        return NextResponse.json(
+          { error: "La categoria no existe." },
+          { status: 404 },
+        );
+      }
+
+      data.categoryId = categoryId;
+    }
+
+    if (Object.keys(data).length === 0) {
+      return NextResponse.json(
+        { error: "No se enviaron campos para actualizar." },
+        { status: 400 },
+      );
+    }
+
+    const productUpdated = await prisma.product.update({
+      where: {
+        id: productId,
+      },
+      data,
+    });
+
+    revalidatePath("/admin");
+    revalidatePath("/catalogo");
+    revalidatePath(`/catalogo/${existingProduct.slug}`);
+    revalidatePath(`/catalogo/${productUpdated.slug}`);
+
+    return NextResponse.json(
+      { message: "¡Producto actualizado correctamente!", data: productUpdated },
+      { status: 200 },
+    );
+  } catch (error) {
+    console.error(error);
+
+    return NextResponse.json(
+      { error: "No se pudo actualizar el producto." },
+      { status: 500 },
+    );
+  }
+}
