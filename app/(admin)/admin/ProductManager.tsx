@@ -148,21 +148,55 @@ export default function ProductManager({ selectedProduct, setSelectedProduct, ca
                 return
             }
 
+            const dataValue: {
+                name?: string;
+                description?: string;
+                price?: number;
+                stock?: number;
+                isActive?: boolean;
+                isFeatured?: boolean;
+                image?: string;
+                categoryId?: number;
+            } = {};
+
+            if(name.trim() !== selectedProduct.name.trim()) {
+                dataValue.name = name
+            }
+
+            if(description.trim() !== selectedProduct.description.trim()) {
+                dataValue.description = description
+            }
+
+            if(priceValue !== selectedProduct.price) {
+                dataValue.price = priceValue
+            }
+
+            if(stockValue !== selectedProduct.stock) {
+                dataValue.stock = stockValue
+            }
+
+            if(isActive !== selectedProduct.isActive) {
+                dataValue.isActive = isActive
+            }
+
+            if(isFeatured !== selectedProduct.isFeatured) {
+                dataValue.isFeatured = isFeatured
+            }
+
+            if(image !== selectedProduct.image) {
+                dataValue.image = image
+            }
+
+            if(categoryIdValue !== selectedProduct.categoryId) {
+                dataValue.categoryId = categoryIdValue
+            }
+
             const response = await fetch(`/api/products/${selectedProduct.id}`, {
-                method: "PUT",
+                method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({
-                    name,
-                    description,
-                    price: priceValue,
-                    stock: stockValue,
-                    categoryId: categoryIdValue,
-                    isActive,
-                    isFeatured,
-                    image,
-                }),
+                body: JSON.stringify(dataValue),
             });
 
             const data = await response.json()
