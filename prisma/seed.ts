@@ -13,6 +13,7 @@ const prisma = new PrismaClient({ adapter });
 
 async function main() {
   const categories = [
+    "Todas",
     "Perfumes",
     "Jabones",
     "Cuidado facial",

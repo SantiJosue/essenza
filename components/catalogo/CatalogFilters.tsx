@@ -45,13 +45,13 @@ export default function CatalogFilters({
                     placeholder="Buscar productos..."
                     value={search}
                     onChange={(event) => setSearch(event.target.value)}
-                    className="w-full rounded-xl border border-essenza-text/15 bg-essenza-background px-4 py-3 outline-none focus:border-essenza-primary sm:flex-1"
+                    className="w-full rounded-xl text-sm border border-essenza-text/15 bg-essenza-background px-4 py-3 outline-none focus:border-essenza-primary sm:flex-1"
                 />
 
                 <select
                     value={selectedCategory}
                     onChange={(event) => setSelectedCategory(event.target.value)}
-                    className="rounded-xl border border-essenza-text/15 bg-essenza-background px-4 py-3 outline-none focus:border-essenza-primary"
+                    className="rounded-xl text-sm border border-essenza-text/15 bg-essenza-background px-4 py-3 outline-none focus:border-essenza-primary"
                 >
                     {categories.map((category) => (
                         <option key={category} value={category}>
@@ -62,7 +62,7 @@ export default function CatalogFilters({
                 <select
                     value={sortOrder}
                     onChange={(event) => setSortOrder(event.target.value)}
-                    className="rounded-xl border border-essenza-text/15 bg-essenza-background px-4 py-3 outline-none focus:border-essenza-primary"
+                    className="rounded-xl text-sm border border-essenza-text/15 bg-essenza-background px-4 py-3 outline-none focus:border-essenza-primary"
                 >
                     <option value="default">Orden original</option>
                     <option value="asc">Precio: menor a mayor</option>

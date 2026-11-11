@@ -8,6 +8,7 @@ import { useCallback, useState } from "react";
 import Notification from "@/components/common/Notification";
 import { useRouter } from "next/navigation";
 import { Category } from "@/src/generated/prisma/client";
+import { normalizeText } from "@/src/utils/normalizeText";
 
 type ProductAdminProps = {
   products: Product[]
@@ -23,6 +24,10 @@ export default function ProductAdmin({ products, categories }: ProductAdminProps
   const [messageType, setMessageType] = useState<"success" | "error">("success")
   const [isClosing, setIsClosing] = useState(false)
   const router = useRouter()
+
+  const [search, setSearch] = useState("")
+  const [selectedCategory, setSelectedCategory] = useState("all")
+  const [sortOrder, setSortOrder] = useState("default")
 
   const productSelected = (product: Product) => {
     setSelectedProduct(product)
@@ -73,6 +78,19 @@ export default function ProductAdmin({ products, categories }: ProductAdminProps
     setProductToDelete(null)
   }
 
+  const filteredProducts = products.filter(product => {
+    const matchesName = normalizeText(product.name).includes(normalizeText(search))
+
+    const matchesCategory = product.categoryId === Number(selectedCategory) || selectedCategory === "all"
+
+    return matchesName && matchesCategory
+  })
+
+  const sortedProducts = sortOrder === "asc"
+    ? [...filteredProducts].sort((a, b) => a.price - b.price)
+    : sortOrder === "desc"
+      ? [...filteredProducts].sort((a, b) => b.price - a.price)
+      : filteredProducts
 
   return (
     <>
@@ -92,81 +110,136 @@ export default function ProductAdmin({ products, categories }: ProductAdminProps
         categories={categories}
       />
 
-      <ul className="mt-8 space-y-4">
-        {products.map((product) => (
-          <li
-            key={product.id}
-            className="rounded-xl border border-essenza-text/10 bg-essenza-surface p-4 sm:p-5"
-          >
+      <div className="mt-5
+       flex flex-col gap-4 sm:flex-row">
+        <input
+          type="search"
+          placeholder="Buscar productos..."
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+          className="w-full rounded-xl text-sm border border-essenza-text/15 bg-essenza-surface px-4 py-3 outline-none focus:border-essenza-primary sm:flex-1"
+        />
 
-            <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-              {/* Información del producto */}
-              <div className="min-w-0 flex-1 sm:pr-8 lg:pr-12">
-                <div className="flex flex-wrap items-center justify-between md:flex-col md:items-baseline gap-1">
-                  <h2 className="font-medium text-essenza-text">
-                    {product.name}
-                  </h2>
+        <select
+          value={selectedCategory}
+          onChange={(event) => setSelectedCategory(event.target.value)}
+          className="rounded-xl text-sm border border-essenza-text/15 bg-essenza-surface px-4 py-3 outline-none focus:border-essenza-primary"
+        >
+          <option value="all">Todas las categorías</option>
 
-                  <p className="shrink-0 font-semibold text-essenza-text">
-                    {formatCurrency(product.price)}
-                  </p>
-                </div>
+          {categories.map((category) => (
+            <option key={category.id} value={category.id}>
+              {category.name}
+            </option>
+          ))}
+        </select>
+        <select
+          value={sortOrder}
+          onChange={(event) => setSortOrder(event.target.value)}
+          className="rounded-xl text-sm border border-essenza-text/15 bg-essenza-surface px-4 py-3 outline-none focus:border-essenza-primary"
+        >
+          <option value="default">Orden original</option>
+          <option value="asc">Precio: menor a mayor</option>
+          <option value="desc">Precio: mayor a menor</option>
+        </select>
+        <button
+          type="button"
+          aria-label="Limpiar filtros"
+          title="Limpiar filtros"
+          onClick={() => {
+            setSearch('')
+            setSelectedCategory('all')
+            setSortOrder('default')
+          }}
+          className="text-sm font-display font-medium text-essenza-primary cursor-pointer hover:underline"
+        >
+          <Trash size={20} />
+        </button>
+      </div>
+      <p className="mt-4 text-sm">
+        Mostrando:
+        <span className="font-medium"> {sortedProducts.length} de {products.length} productos</span>
+      </p>
 
-                <p className="mt-2 text-sm text-essenza-text/70">
-                  {product.description}
-                </p>
+      <ul className="mt-4 space-y-4">
+        {sortedProducts.length > 0 ? (
+          sortedProducts.map((product) => (
+            <li
+              key={product.id}
+              className="rounded-xl border border-essenza-text/10 bg-essenza-surface p-4 sm:p-5"
+            >
 
-                <p className="mt-1 text-sm text-essenza-text/60">
-                  Categoría: {product.category.name}
-                </p>
-              </div>
+              <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+                {/* Información del producto */}
+                <div className="min-w-0 flex-1 sm:pr-8 lg:pr-12">
+                  <div className="flex flex-wrap items-center justify-between md:flex-col md:items-baseline gap-1">
+                    <h2 className="font-medium text-essenza-text">
+                      {product.name}
+                    </h2>
 
-              {/* Precio, stock y acciones */}
-              <div className="flex flex-wrap items-center justify-between gap-4 sm:justify-end">
-                <div className="flex items-center gap-2 sm:gap-4">
-                  <Package size={18} className="text-essenza-text/60" />
-
-                  <div>
-                    <p className="text-xs text-essenza-text/60">
-                      Stock disponible
-                    </p>
-
-                    <p className="text-sm font-semibold text-essenza-text">
-                      {product.stock} unidades
+                    <p className="shrink-0 font-semibold text-essenza-text">
+                      {formatCurrency(product.price)}
                     </p>
                   </div>
 
-                  <span
-                    className={`rounded-full px-3 py-1 text-xs font-medium ${product.stock > 0
-                      ? "bg-emerald-500/10 text-emerald-700"
-                      : "bg-red-500/10 text-red-600"
-                      }`}
-                  >
-                    {product.stock > 0 ? "Disponible" : "Agotado"}
-                  </span>
+                  <p className="mt-2 text-sm text-essenza-text/70">
+                    {product.description}
+                  </p>
+
+                  <p className="mt-1 text-sm text-essenza-text/60">
+                    Categoría: {product.category.name}
+                  </p>
                 </div>
 
-                <div className="flex flex-wrap gap-2 *:cursor-pointer">
-                  <button
-                    onClick={() => productSelected(product)}
-                    className="inline-flex items-center justify-center gap-2 rounded-2xl bg-essenza-primary px-4 py-2 text-sm font-medium text-white transition-colors hover:opacity-90"
-                  >
-                    Editar
-                    <Edit2Icon size={16} />
-                  </button>
+                {/* Precio, stock y acciones */}
+                <div className="flex flex-wrap items-center justify-between gap-4 sm:justify-end">
+                  <div className="flex items-center gap-2 sm:gap-4">
+                    <Package size={18} className="text-essenza-text/60" />
 
-                  <button
-                    onClick={() => setProductToDelete(product)}
-                    className="inline-flex items-center justify-center gap-2 rounded-2xl bg-red-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:opacity-80"
-                  >
-                    Eliminar
-                    <Trash size={16} />
-                  </button>
+                    <div>
+                      <p className="text-xs text-essenza-text/60">
+                        Stock disponible
+                      </p>
+
+                      <p className="text-sm font-semibold text-essenza-text">
+                        {product.stock} unidades
+                      </p>
+                    </div>
+
+                    <span
+                      className={`rounded-full px-3 py-1 text-xs font-medium ${product.stock > 0
+                        ? "bg-emerald-500/10 text-emerald-700"
+                        : "bg-red-500/10 text-red-600"
+                        }`}
+                    >
+                      {product.stock > 0 ? "Disponible" : "Agotado"}
+                    </span>
+                  </div>
+
+                  <div className="flex flex-wrap gap-2 *:cursor-pointer">
+                    <button
+                      onClick={() => productSelected(product)}
+                      className="inline-flex items-center justify-center gap-2 rounded-2xl bg-essenza-primary px-4 py-2 text-sm font-medium text-white transition-colors hover:opacity-90"
+                    >
+                      Editar
+                      <Edit2Icon size={16} />
+                    </button>
+
+                    <button
+                      onClick={() => setProductToDelete(product)}
+                      className="inline-flex items-center justify-center gap-2 rounded-2xl bg-red-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:opacity-80"
+                    >
+                      Eliminar
+                      <Trash size={16} />
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          </li>
-        ))}
+            </li>
+          ))
+        ) : (
+          <li className="text-sm font-medium text-essenza-text/50">No se encontraron productos</li>
+        )}
       </ul>
 
       {productToDelete && (
