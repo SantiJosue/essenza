@@ -1,7 +1,7 @@
 "use client"
 
 import ProductManager from "./ProductManager";
-import { Edit2Icon, Package, Trash } from "lucide-react";
+import { ArrowLeft, ArrowRight, Edit2Icon, Package, Trash } from "lucide-react";
 import { formatCurrency } from "@/src/utils/formatCurrency";
 import { Product } from "@/src/types/product";
 import { useCallback, useState } from "react";
@@ -28,6 +28,8 @@ export default function ProductAdmin({ products, categories }: ProductAdminProps
   const [search, setSearch] = useState("")
   const [selectedCategory, setSelectedCategory] = useState("all")
   const [sortOrder, setSortOrder] = useState("default")
+
+  const [currentPage, setCurrentPage] = useState(1)
 
   const productSelected = (product: Product) => {
     setSelectedProduct(product)
@@ -92,6 +94,24 @@ export default function ProductAdmin({ products, categories }: ProductAdminProps
       ? [...filteredProducts].sort((a, b) => b.price - a.price)
       : filteredProducts
 
+  const itemsPerPage = 5;
+  const totalPages = Math.ceil(sortedProducts.length / itemsPerPage);
+
+  const validPage = Math.min(currentPage, Math.max(totalPages, 1));
+
+  const showPage = sortedProducts.slice(
+    (validPage - 1) * itemsPerPage,
+    validPage * itemsPerPage
+  );
+  
+  const handleNextPage = () => {
+    setCurrentPage(validPage < totalPages ? validPage + 1 : validPage)
+  }
+
+  const handlePrevPage = () => {
+    setCurrentPage(validPage > 1 ? validPage - 1 : validPage)
+  }
+
   return (
     <>
       {showMessage && (
@@ -116,13 +136,19 @@ export default function ProductAdmin({ products, categories }: ProductAdminProps
           type="search"
           placeholder="Buscar productos..."
           value={search}
-          onChange={(event) => setSearch(event.target.value)}
+          onChange={(event) => {
+            setSearch(event.target.value)
+            setCurrentPage(1)
+          }}
           className="w-full rounded-xl text-sm border border-essenza-text/15 bg-essenza-surface px-4 py-3 outline-none focus:border-essenza-primary sm:flex-1"
         />
 
         <select
           value={selectedCategory}
-          onChange={(event) => setSelectedCategory(event.target.value)}
+          onChange={(event) => {
+            setSelectedCategory(event.target.value)
+            setCurrentPage(1)
+          }}
           className="rounded-xl text-sm border border-essenza-text/15 bg-essenza-surface px-4 py-3 outline-none focus:border-essenza-primary"
         >
           <option value="all">Todas las categorías</option>
@@ -135,7 +161,10 @@ export default function ProductAdmin({ products, categories }: ProductAdminProps
         </select>
         <select
           value={sortOrder}
-          onChange={(event) => setSortOrder(event.target.value)}
+          onChange={(event) => {
+            setSortOrder(event.target.value)
+            setCurrentPage(1)
+          }}
           className="rounded-xl text-sm border border-essenza-text/15 bg-essenza-surface px-4 py-3 outline-none focus:border-essenza-primary"
         >
           <option value="default">Orden original</option>
@@ -150,6 +179,7 @@ export default function ProductAdmin({ products, categories }: ProductAdminProps
             setSearch('')
             setSelectedCategory('all')
             setSortOrder('default')
+            setCurrentPage(1)
           }}
           className="text-sm font-display font-medium text-essenza-primary cursor-pointer hover:underline"
         >
@@ -162,8 +192,8 @@ export default function ProductAdmin({ products, categories }: ProductAdminProps
       </p>
 
       <ul className="mt-4 space-y-4">
-        {sortedProducts.length > 0 ? (
-          sortedProducts.map((product) => (
+        {showPage.length > 0 ? (
+          showPage.map((product) => (
             <li
               key={product.id}
               className="rounded-xl border border-essenza-text/10 bg-essenza-surface p-4 sm:p-5"
@@ -218,6 +248,9 @@ export default function ProductAdmin({ products, categories }: ProductAdminProps
 
                   <div className="flex flex-wrap gap-2 *:cursor-pointer">
                     <button
+                      type="button"
+                      aria-label="Editar producto"
+                      title="Editar producto"
                       onClick={() => productSelected(product)}
                       className="inline-flex items-center justify-center gap-2 rounded-2xl bg-essenza-primary px-4 py-2 text-sm font-medium text-white transition-colors hover:opacity-90"
                     >
@@ -226,6 +259,9 @@ export default function ProductAdmin({ products, categories }: ProductAdminProps
                     </button>
 
                     <button
+                      type="button"
+                      aria-label="Eliminar Producto"
+                      title="Eliminar Producto"
                       onClick={() => setProductToDelete(product)}
                       className="inline-flex items-center justify-center gap-2 rounded-2xl bg-red-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:opacity-80"
                     >
@@ -241,6 +277,40 @@ export default function ProductAdmin({ products, categories }: ProductAdminProps
           <li className="text-sm font-medium text-essenza-text/50">No se encontraron productos</li>
         )}
       </ul>
+
+      {totalPages > 0 && (
+        <section>
+          <div className="mt-8 w-full flex gap-2 items-center justify-center">
+            <button
+              type="button"
+              aria-label="Atras"
+              title="Atras"
+              onClick={handlePrevPage}
+              disabled={validPage === 1}
+              className="bg-essenza-primary/80 rounded-full p-2 cursor-pointer transition-all hover:opacity-90 active:scale-90"
+            >
+              <ArrowLeft size={20} color="white" />
+            </button>
+            <p className="font-medium">Página: <span className="font-bold">{validPage}</span></p>
+            <button
+              type="button"
+              aria-label="Siguiente"
+              title="Siguiente"
+              onClick={handleNextPage}
+              disabled={validPage >= totalPages}
+              className="bg-essenza-primary/80 rounded-full p-2 cursor-pointer transition-all hover:opacity-90 active:scale-90"
+            >
+              <ArrowRight size={20} color="white" />
+            </button>
+          </div>
+          <div className="mt-2 w-full text-center">
+            <p>
+              Mostrando
+              <span className="font-bold"> {validPage}</span> de <span className="font-bold">{totalPages}</span> páginas
+            </p>
+          </div>
+        </section>
+      )}
 
       {productToDelete && (
         <section
