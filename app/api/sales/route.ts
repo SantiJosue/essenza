@@ -1,6 +1,7 @@
 import { authOptions } from "@/src/lib/auth-options";
 import { prisma } from "@/src/lib/prisma";
 import { getServerSession } from "next-auth";
+import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 
 type SaleItemInput = {
@@ -182,6 +183,7 @@ export async function POST(request: Request) {
 
       return currentSale;
     });
+    revalidatePath("/ventas")
 
     return NextResponse.json(
       {

@@ -3,7 +3,8 @@
 import Notification from "@/components/common/Notification"
 import { Category } from "@/src/generated/prisma/client"
 import { Product } from "@/src/types/product"
-import { PlusIcon, X } from "lucide-react"
+import { ListCheckIcon, PlusIcon, X } from "lucide-react"
+import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useCallback, useState } from "react"
 
@@ -280,17 +281,26 @@ export default function ProductManager({ selectedProduct, setSelectedProduct, ca
                 />
             }
 
-            <button
-                type="button"
-                onClick={() => {
-                    setIsFormOpen(true)
-                    setSelectedProduct(null)
-                }}
-                className="mt-6 inline-flex gap-2 items-center justify-center rounded-xl bg-essenza-primary px-5 py-3 font-medium text-white cursor-pointer transition-opacity hover:opacity-90"
-            >
-                Agregar producto
-                <PlusIcon size={16} />
-            </button>
+            <div className="mt-6 flex gap-2 items-center">
+                <button
+                    type="button"
+                    onClick={() => {
+                        setIsFormOpen(true)
+                        setSelectedProduct(null)
+                    }}
+                    className="inline-flex gap-2 items-center justify-center rounded-xl bg-essenza-primary px-5 py-3 font-medium text-white cursor-pointer transition-opacity hover:opacity-90"
+                    >
+                    Agregar producto
+                    <PlusIcon size={16} />
+                </button>
+                <Link 
+                    href={"/ventas"}
+                    className="inline-flex gap-2 items-center rounded-xl text-essenza-primary border border-essenza-primary bg-white/50 px-5 py-3 font-medium cursor-pointer transition-opacity hover:opacity-90"
+                >
+                    Ver historial de ventas
+                    <ListCheckIcon size={16} />
+                </Link>
+            </div>
 
             {(isFormOpen || selectedProduct) && (
                 <div className="fixed inset-0 z-30 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm" onClick={(e) => {
