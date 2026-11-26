@@ -3,7 +3,8 @@ import BackLink from "@/components/common/BackLink"
 import Notification from "@/components/common/Notification"
 import { Product } from "@/src/types/product"
 import { formatCurrency } from "@/src/utils/formatCurrency"
-import { MinusCircle, Package, PlusCircle, PlusIcon, Trash } from "lucide-react"
+import { CircleCheck, ClipboardList, MinusCircle, Package, PlusCircle, PlusIcon, Trash } from "lucide-react"
+import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { useCallback, useState } from "react"
 
@@ -144,20 +145,29 @@ export default function SaleForm({ products }: SaleFormProps) {
             products.map(product => (
               <article
                 key={product.id}
-                className="space-y-2 rounded-2xl bg-white p-4 shadow"
+                className="relative rounded-2xl bg-white p-4 shadow"
               >
-                <h3 className="font-medium">{product.name}</h3>
+                <figure className="relative aspect-square w-full overflow-hidden rounded-2xl bg-essenza-primary/10">
+                  <Image
+                    alt={product.name}
+                    src={product.image}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width:640px) 100vw, (max-width:1024px) 50vw, 33vw"
+                  />
+                </figure>
+                <h3 className="mt-4 font-medium text-lg">{product.name}</h3>
 
                 <p className="text-sm text-essenza-text/90">
                   {product.category.name}
                 </p>
 
-                <p className="inline-flex items-center gap-2 text-sm font-medium">
+                <p className="mt-2 inline-flex items-center gap-2 text-sm font-medium bg-essenza-primary/20 shadow rounded-2xl px-3 py-1">
                   <Package size={16} />
                   Stock: {product.stock}
                 </p>
 
-                <p className="font-medium">{formatCurrency(product.price)}</p>
+                <p className="mt-2 font-medium text-lg">{formatCurrency(product.price)}</p>
 
                 <button
                   type="button"
@@ -165,34 +175,43 @@ export default function SaleForm({ products }: SaleFormProps) {
                   title="agregar al resumen"
                   onClick={() => addProduct(product)}
                   disabled={isSubmitting}
-                  className="w-full inline-flex justify-center items-center gap-2 bg-essenza-primary/90 disabled:cursor-not-allowed disabled:opacity-30
+                  className="mt-2 w-full inline-flex justify-center items-center gap-2 bg-essenza-primary/90 disabled:cursor-not-allowed disabled:opacity-30
                  text-white rounded-xl px-6 py-2 transition-all hover:opacity-90 cursor-pointer active:scale-90"
                 >
                   Agregar
-                  <PlusIcon size={14} />
+                  <PlusIcon size={16} />
                 </button>
               </article>
             ))
           ) : (
-            <p className="col-span-full text-center text-sm text-essenza-text/90">
-              No hay productos para mostrar...
-            </p>
+            <section className="col-span-full flex min-h-64 flex-col items-center justify-center rounded-2xl bg-white px-6 py-12 text-center shadow">
+              <h3 className="text-base font-medium text-essenza-text">
+                No hay productos disponibles para vender
+              </h3>
+
+              <p className="mt-2 max-w-sm text-sm text-essenza-text/70">
+                Los productos sin stock o inactivos no aparecen en esta sección.
+              </p>
+            </section>
           )}
         </div>
 
         <aside className="h-fit rounded-2xl bg-white p-5 shadow">
-          <h2 className="text-lg font-medium">
-            Resumen de venta
-          </h2>
+          <div className="flex items-center justify-between font-medium">
+            <h2 className="text-xl">Resumen de venta</h2>
+            <div>
+              <ClipboardList className="text-essenza-primary" />
+            </div>
+          </div>
           <div>
             {selectedProducts.length > 0 ? (
               <div className="mt-4 space-y-4">
                 {selectedProducts.map(product => (
-                  <ul
+                  <article
                     key={product.product.id}
                     className="flex flex-col gap-2 border border-gray-200 shadow p-4 rounded-2xl"
                   >
-                    <li className="font-medium">
+                    <div className="font-medium text-lg">
                       <div className="w-full inline-flex justify-between">
                         <p>{product.product.name}</p>
                         <button
@@ -203,14 +222,13 @@ export default function SaleForm({ products }: SaleFormProps) {
                           disabled={isSubmitting}
                           className="cursor-pointer transition-transform hover:scale-110 active:scale-90 disabled:cursor-not-allowed disabled:opacity-30"
                         >
-                          <Trash size={20} color="red" />
+                          <Trash size={20} className="text-essenza-primary hover:text-red-500" />
                         </button>
                       </div>
-                    </li>
-                    <li className="text-sm text-essenza-text/90">{product.product.category.name}</li>
-                    <li className="font-medium">
-                      <p>Cantidad: {product.quantity}</p>
-                      <p className="mt-2 flex items-center gap-2">
+                      <p className="text-sm text-essenza-text/90">{product.product.category.name}</p>
+                    </div>
+                    <div className="mt-2 font-medium flex flex-wrap justify-between">
+                      <p className="flex items-center gap-2">
                         <button
                           type="button"
                           aria-label="aumentar cantidad"
@@ -219,8 +237,9 @@ export default function SaleForm({ products }: SaleFormProps) {
                           disabled={product.product.stock <= product.quantity || isSubmitting}
                           className="cursor-pointer disabled:cursor-not-allowed disabled:opacity-30"
                         >
-                          <PlusCircle size={24} color="green" className="transition-transform hover:scale-105 active:scale-90" />
+                          <PlusCircle size={24} className="transition-transform hover:scale-105 active:scale-90 text-essenza-primary" />
                         </button>
+                        {product.quantity}
                         <button
                           type="button"
                           aria-label="disminuir cantidad"
@@ -229,25 +248,34 @@ export default function SaleForm({ products }: SaleFormProps) {
                           disabled={product.quantity <= 1 || isSubmitting}
                           className="cursor-pointer disabled:cursor-not-allowed disabled:opacity-30"
                         >
-                          <MinusCircle size={24} color="red" className="transition-transform hover:scale-105 active:scale-90" />
+                          <MinusCircle size={24} className="transition-transform hover:scale-105 active:scale-90 text-red-400" />
                         </button>
                       </p>
-                    </li>
-                    <li className="text-sm font-medium">Precio unitario: {formatCurrency(product.product.price)}</li>
-                    <li className="py-1 border-t border-gray-200 font-medium">Subtotal: {formatCurrency(product.product.price * product.quantity)}</li>
-                  </ul>
+                      <p className="text-sm font-medium">Precio unitario: {formatCurrency(product.product.price)}</p>
+                    </div>
+                    <div className="mt-2 pt-4 flex flex-wrap justify-between items-center border-t border-gray-200 font-medium">
+                      <p>Subtotal:</p>
+                      <p>{formatCurrency(product.product.price * product.quantity)}</p>
+                    </div>
+                  </article>
                 ))}
-                <p className="mt-4 text-lg font-medium">Total: {formatCurrency(total)}</p>
+                <div className="mt-6 border-t border-gray-200">
+                  <div className="mt-4 flex items-center justify-between text-2xl font-medium">
+                    <p>Total:</p>
+                    <p>{formatCurrency(total)}</p>
+                  </div>
+                </div>
                 <button
                   type="submit"
                   aria-label="confirmar ventas"
                   title="confirmar ventas"
                   onClick={handleSubmit}
                   disabled={isSubmitting}
-                  className="w-full bg-essenza-primary/90 disabled:opacity-50 disabled:cursor-not-allowed
-                 text-white rounded-xl px-6 py-2 transition-all hover:opacity-90 cursor-pointer active:scale-90"
+                  className="flex justify-center items-center gap-2 w-full bg-essenza-primary/90 disabled:opacity-50 disabled:cursor-not-allowed
+                 text-white rounded-xl px-6 py-3 transition-all hover:opacity-90 cursor-pointer active:scale-90"
                 >
                   {isSubmitting ? "Registrando venta..." : "Confirmar venta"}
+                  <CircleCheck />
                 </button>
               </div>
             ) : (
