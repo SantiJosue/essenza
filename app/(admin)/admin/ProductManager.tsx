@@ -3,7 +3,7 @@
 import Notification from "@/components/common/Notification"
 import { Category } from "@/src/generated/prisma/client"
 import { Product } from "@/src/types/product"
-import { ListCheckIcon, PlusIcon, X } from "lucide-react"
+import { ClipboardList, ListCheckIcon, PlusIcon, X } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useCallback, useState } from "react"
@@ -294,11 +294,18 @@ export default function ProductManager({ selectedProduct, setSelectedProduct, ca
                     <PlusIcon size={16} />
                 </button>
                 <Link 
-                    href={"/ventas"}
+                    href={"/admin/ventas"}
                     className="inline-flex gap-2 items-center rounded-xl text-essenza-primary border border-essenza-primary bg-white/50 px-5 py-3 font-medium cursor-pointer transition-opacity hover:opacity-90"
                 >
                     Ver historial de ventas
                     <ListCheckIcon size={16} />
+                </Link>
+                <Link 
+                    href={"/admin/nueva-venta"}
+                    className="inline-flex gap-2 items-center rounded-xl text-essenza-primary border border-essenza-primary bg-white/50 px-5 py-3 font-medium cursor-pointer transition-opacity hover:opacity-90"
+                >
+                    Registrar venta
+                    <ClipboardList size={16} />
                 </Link>
             </div>
 
