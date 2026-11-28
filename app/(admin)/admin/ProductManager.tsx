@@ -281,7 +281,7 @@ export default function ProductManager({ selectedProduct, setSelectedProduct, ca
                 />
             }
 
-            <div className="mt-6 flex gap-2 items-center">
+            <div className="mt-6 flex flex-col md:flex-row gap-2 items-center *:w-full md:*:w-auto *:justify-center">
                 <button
                     type="button"
                     onClick={() => {
